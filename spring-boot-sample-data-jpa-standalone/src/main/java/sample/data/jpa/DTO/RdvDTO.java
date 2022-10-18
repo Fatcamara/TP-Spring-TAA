@@ -1,14 +1,8 @@
 package sample.data.jpa.DTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import sample.data.jpa.domain.RdvJPA;
-
-import java.sql.Date;
-import java.time.LocalTime;
-import java.util.TimeZone;
-import java.util.Timer;
 
 /**
- * Classe DTO pour la creation d'un rendez-vous à travers une date, un time, un prof et un étudiant.
+ * Classe DTO pour le mapping d'un rendez-vous à travers une date, un time, un prof et un étudiant.
  */
 public class RdvDTO {
 

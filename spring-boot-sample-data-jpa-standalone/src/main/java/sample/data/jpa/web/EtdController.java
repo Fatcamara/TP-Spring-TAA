@@ -3,10 +3,12 @@ package sample.data.jpa.web;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import sample.data.jpa.domain.EtdJPA;
+import sample.data.jpa.Model.EtdJPA;
 import sample.data.jpa.service.EtdDAO;
 
 /**
@@ -16,6 +18,8 @@ import sample.data.jpa.service.EtdDAO;
 @Controller
 @RequestMapping("/etdcontroller")
 public class EtdController {
+
+    Logger logger = LoggerFactory.getLogger(String.valueOf(EtdController.class));
 
     @Autowired
     private EtdDAO etdD;
@@ -29,14 +33,14 @@ public class EtdController {
      * @return le nom de l'étudiant si l'operation d'insertion a bien reussi,sinon retourne erreur.
      */
 
-        @RequestMapping("/create")
+    @PostMapping("/create")
         @ResponseBody
-        @ApiOperation(value="Inscrire un élève avec son nom, son prénom et son adresse mail.",
-                notes ="Cette méthode inscrit un élève avec son nom, prénom et son adresse mail en lui attribuant un identifiant dans la base de donnée.",
+        @ApiOperation(value="Insertion d'un élève avec son nom, son adresse email, son année scolaire et sa filière.",
+                notes ="Cette méthode crée un élève avec un identifiant et les attributs cités ci-dessus dans la base de données.",
                 response= EtdJPA.class)
         @ApiResponses(value ={
-                @ApiResponse(code=201, message="L'élève a bien été inscrit en base de données"),
-                @ApiResponse(code=400, message = "L'élève n'a pas été enregistré") })
+                @ApiResponse(code=201, message="Insertion reussie d'un elève "),
+                @ApiResponse(code=400, message = "Insertion echoueé d'un l'élève ") })
         public String create(@RequestParam String name, String email, int anneeScol, String filiere) {
             String userStudentname = "";
             try {
@@ -47,21 +51,33 @@ public class EtdController {
             catch (Exception ex) {
                 return "Error creating the user: " + ex.toString();
             }
-            return "User successfully created with name = " + userStudentname;
+            return "UserStudent successfully created with name = " + userStudentname;
         }
 
     /**
      * Delete/ delete --> Supprime un étudiant de la bdd dès qu'on lui passe son id.
      * @param id
      * @return un message indiquant la suppression de l'etudiant associé à l'id.
+     * Elle supprime aussi bien via postman que via le formulaire.
      */
 
     //@RequestMapping("/delete")
-    @RequestMapping(value = "DeleteUser.html/",method = RequestMethod.DELETE)
+    @PostMapping("/delete")
     @ResponseBody
-        public String delete( @ModelAttribute Long id) {
+    @ApiOperation(value="Suppression d'un élève dans la base de données à partir de son Id.",
+            notes ="Cette méthode supprime un élève grace à son identifiant dans la base de données.",
+            response= EtdJPA.class)
+    @ApiResponses(value ={
+            @ApiResponse(code=201, message="Suppression reussie d'un l'elève "),
+            @ApiResponse(code=400, message = "Suppression echoueé d'un l'élève ") })
+
+    public String delete(@RequestParam long id) {
+        logger.warn("avant");
             try {
+
+                logger.warn("avant ID" + id);
                 etdD.findById(id);
+                logger.warn("avant ID" + id);
                 etdD.deleteById(id);
             }
             catch (Exception ex) {
@@ -75,18 +91,28 @@ public class EtdController {
      * @param email
      * @return l'Id de l'etudiant associé à l'email s'il existe, sinon retourne "user not found".
      */
-    @RequestMapping("/get-by-email")
-        @ResponseBody
-        public String getByEmail(@RequestParam String email) {
+    @PostMapping("/get-by-email")
+    @ResponseBody
+    @ApiOperation(value="retrouver un élève à partir de  son adresse email dans la base de données.",
+            notes ="Cette méthode retrouve un élève dès qu'on a son email, dans la base de données.",
+            response= EtdJPA.class)
+    @ApiResponses(value ={
+            @ApiResponse(code=201, message="L'elève a bien été retrouvé dans la base de données"),
+            @ApiResponse(code=400, message = " L'elève n'existe pas dans la base de données")})
+
+    public String getByEmail(@RequestParam String email) {
             String studentId = "";
+            String studentName = "";
             try {
                 EtdJPA etd = etdD.findByEmail(email);
                 studentId = String.valueOf(etd.getId());
+                studentName = String.valueOf(etd.getName());
+
             }
             catch (Exception ex) {
                 return "User not found";
             }
-            return "The StudentUser id is: " + studentId;
+            return "The StudentUser id is: " + studentId+" and name is "+studentName;
         }
 
     /**
@@ -96,8 +122,15 @@ public class EtdController {
      * @param name
      * @return mis à jour de userstudent reussi, sinon retourne erreur.
      */
-        @RequestMapping("/update")
+        @PostMapping("/update")
         @ResponseBody
+        @ApiOperation(value="modification du nom,de l'adresse email d'un élève à partir de son ID dans la base de données.",
+                notes ="Cette méthode met à jour l'email et le nom d'un élève dans la base de données.",
+                response= EtdJPA.class)
+        @ApiResponses(value ={
+                @ApiResponse(code=201, message="Mis à jour reussi de l'elève "),
+                @ApiResponse(code=400, message = "Echec du mis à jour de l'élève ") })
+
         public String update( @RequestParam  long id, String email, String name) {
             try {
                 EtdJPA etd = etdD.findByid(id);

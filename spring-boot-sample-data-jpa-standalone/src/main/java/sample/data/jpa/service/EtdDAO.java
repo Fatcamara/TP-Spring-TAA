@@ -4,8 +4,7 @@ package sample.data.jpa.service;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-import sample.data.jpa.domain.EtdJPA;
+import sample.data.jpa.Model.EtdJPA;
 
 /**
  * Classe EtdDAO qui herite de JpaRepository pour implementer certaines méthodes.
@@ -21,7 +20,7 @@ public interface EtdDAO extends JpaRepository<EtdJPA, Long> {
    public EtdJPA findByEmail(String email);
 
    /**
-    *fonction qui retrouve chaque étudiant quand on lui passe son id.
+    *fonction qui retrouve un étudiant present dans la base de données quand on lui passe son id.
     * @param id
     * @return
     */
